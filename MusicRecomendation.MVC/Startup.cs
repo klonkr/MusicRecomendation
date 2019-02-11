@@ -31,7 +31,8 @@ namespace MusicRecomendation.MVC
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            var section = Configuration.GetSection("ApplicationConfig");
+            services.Configure<ApplicationConfig>(section);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

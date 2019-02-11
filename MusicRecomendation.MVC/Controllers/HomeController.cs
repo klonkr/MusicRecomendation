@@ -4,15 +4,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using MusicRecomendation.MVC.Models;
 
 namespace MusicRecomendation.MVC.Controllers
 {
     public class HomeController : Controller
     {
+        public IOptions<ApplicationConfig> Config { get; set; }
+        public HomeController(IOptions<ApplicationConfig> config)
+        {
+            Config = config;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            var viewModel = new HomeViewModel
+            {
+                BaseUrl = Config.Value.BaseUrl
+            };
+            return View(viewModel);
         }
 
         public IActionResult About()

@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@model MusicRecomendation.MVC.Models.HomeViewModel
 <style>
 
     #results:nth-child(even) {
@@ -208,7 +209,7 @@
 <script>
 
     var genresLoaded = false;
-
+    var baseUrl = "@Model.BaseUrl";
     function checkboxChange(element, event) {
 
     }
@@ -283,7 +284,7 @@
 
         $.ajax({
             type: "POST",
-            url: "https://localhost:44388/api/Recommendation/Get",
+            url: baseUrl+"api/Recommendation/Get",
             data: JSON.stringify(query),
             success: function (data) {
                 var container = document.getElementById("recommendations");
@@ -425,7 +426,7 @@
         container.innerHTML = "";
         var request = new XMLHttpRequest();
 
-        request.open('GET', 'https://localhost:44388/api/Search?query=' + query + '&types=' + type, true);
+        request.open('GET', baseUrl +'api/Search?query=' + query + '&types=' + type, true);
         request.onload = function () {
 
             // Begin accessing JSON data here
@@ -474,7 +475,7 @@
     function callApi() {
         var request = new XMLHttpRequest();
 
-        request.open('GET', 'https://localhost:44388/api/Recommendation/getgenres', true);
+        request.open('GET', baseUrl +'api/Recommendation/getgenres', true);
         request.onload = function () {
 
             var data = JSON.parse(this.response);
