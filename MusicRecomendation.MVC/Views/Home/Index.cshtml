@@ -1,0 +1,499 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+
+    #results:nth-child(even) {
+        background-color: lightgray;
+    }
+
+    .genre:hover {
+        background-color: lightcyan;
+    }
+
+    .attribute:hover {
+        background-color: lightblue;
+    }
+
+    .track:hover {
+        background-color: lightcoral;
+    }
+
+    .artist:hover {
+        background-color: lightblue;
+        cursor: pointer;
+    }
+
+
+    /* Style the tab */
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+
+            /* Change background color of buttons on hover */
+            .tab button:hover {
+                background-color: #ddd;
+            }
+
+            /* Create an active/current tablink class */
+            .tab button.active {
+                background-color: #ccc;
+            }
+
+    /* Style the tab content */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+</style>
+<div class="container">
+
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'artists')">Artists</button>
+                <button class="tablinks" onclick="openTab(event, 'tracks')">Tracks</button>
+                <button class="tablinks" onclick="openTab(event, 'attributes')">Attributes</button>
+                <button class="tablinks" onclick="openTab(event, 'genres')">Genres</button>
+            </div>
+
+            <!-- Tab content -->
+            <div id="artists" class="tabcontent">
+                <div class="form-group">
+                    <h4>Artists</h4>
+                    <div class="row">
+                        <div class="col-9">
+                            <input type="text" id="searchArtist" class="form-control" placeholder="Search for artist">
+                        </div>
+                        <div class="col">
+                            <button onclick="search(this, 'artist')" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                    <h4>Search results</h4>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="artistResults">
+
+                            </div>
+                        </div>
+                    </div>
+                    <h4>Added artists</h4>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="artistAdded">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tracks" class="tabcontent">
+                <h4>Tracks</h4>
+                <div class="row">
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="trackInput" placeholder="Search for track">
+                    </div>
+                    <div class="col">
+                        <button onclick="search(this, 'track')" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+                <h4>Search results</h4>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="trackResults">
+
+                        </div>
+                    </div>
+                </div>
+                <h4>Added tracks</h4>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="trackAdded">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="attributes" class="tabcontent">
+                <h4>Attributes</h4>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-6">
+                            <select class="form-control" id="attributeOptions" onchange="checkboxChange(this, event)">
+                                <option value="acousticness">acousticness</option>
+                                <option value="danceability">danceability</option>
+                                @*<option value="duration_ms">duration_ms</option>*@
+                                <option value="energy">energy</option>
+                                <option value="instrumentalness">instrumentalness</option>
+                                @*<option value="key">key</option>*@
+                                <option value="liveness">liveness</option>
+                                @*<option value="loudness">loudness</option>*@
+                                <option value="mode">mode</option>
+                                @*<option value="popularity">popularity</option>*@
+                                <option value="speechiness">speechiness</option>
+                                <option value="tempo">tempo</option>
+                                @*<option value="time_signature">time_signature</option>*@
+                                <option value="valence">valence</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control" id="attributeValue" type="number" name="name" value="0" step="0.1" min="0" max="1" />
+                        </div>
+                        <div class="col">
+                            <button onclick="addAttribute(this)" class="btn btn-primary">Add</button>
+                        </div>
+                    </div>
+                    <h4>Added attributes</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div id="selectedAttributes">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div id="genres" class="tabcontent">
+                <h4>Genres</h4>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-9">
+                            <select class="form-control" id="genreOptions" onchange="checkboxChange(this, event)"></select>
+                        </div>
+                        <div class="col">
+                            <button onclick="addGenre(this)" class="btn btn-primary">Add</button>
+                        </div>
+                    </div>
+                    <h4>Added genres</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div id="selectedGenres">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button style="margin-top: 10px;" onclick="getRecommendation(this)" class="btn btn-primary">Get Recommendation</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div id="recommendations"></div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var genresLoaded = false;
+
+    function checkboxChange(element, event) {
+
+    }
+
+    function getRecommendation() {
+        var container = document.getElementById("recommendations");
+        container.innerHTML = "";
+        var artistIds = $("#artistAdded .artist").map(function () {
+            return $(this).attr('id');
+        }).get();
+
+        var trackIds = $("#trackAdded .track").map(function () {
+            return $(this).attr('id');
+        }).get();
+
+        var genresJQ = $("#selectedGenres .genre").map(function () {
+            return $(this).attr('id');
+        }).get();
+
+        var attributes = $(".attribute");
+
+        var attributeArray = [];
+
+        attributes.each(function (element) {
+            var att = {
+                "Attribute": { "Item1": this.children[0].innerText, "Item2": this.children[1].innerText }
+            }
+            attributeArray.push(att);
+        })
+
+        var artists = [];
+
+        for (var i = 0; i < artistIds.length; i++) {
+            artists.push({ "id": artistIds[i] })
+        }
+
+        var tracks = [];
+
+        for (var i = 0; i < trackIds.length; i++) {
+            tracks.push({ "id": trackIds[i] })
+        }
+
+        var genres = [];
+
+        for (var i = 0; i < genresJQ.length; i++) {
+            genres.push({ "GenreName": genresJQ[i] })
+        }
+
+        var query = {
+            "Limit": 20,
+            "Market": "SE",
+            "SeedArtists": artists,
+            //"SeedArtists": [
+            //    {"id": "string"}
+            //],
+            "Tracks": tracks,
+            "Genres": genres,
+            //"Genres": [
+            //    { "GenreName": "punk-rock" }
+            //],
+            "Attributes": attributeArray
+            //"Attributes": [
+            //    {
+            //        "Attribute": { "Item1": "Loudness", "Item2": 1.0 }
+            //    },
+            //    {
+            //        "Attribute": { "Item1": "Lource", "Item2": 0.5 }
+            //    }
+            //]
+
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "https://localhost:44388/api/Recommendation/Get",
+            data: JSON.stringify(query),
+            success: function (data) {
+                var container = document.getElementById("recommendations");
+                if (data.tracks !== null) {
+                    for (var i = 0; i < data.tracks.length; i++) {
+                        var div = document.createElement("div");
+                        var divArtist = document.createElement("div");
+                        var divPreview = document.createElement("div");
+
+
+                        div.style.height = "56px";
+                        div.classList.add("row")
+
+                        divArtist.classList.add("col");
+                        divPreview.classList.add("col");
+
+                        var span = document.createElement("span");
+                        var audio = document.createElement("audio");
+                        audio.controls = "controls";
+                        audio.style.width = "200px";
+                        audio.src = data.tracks[i].preview_url;
+
+                        var artists = "";
+
+                        for (var j = 0; j < data.tracks[j].artists.length; j++) {
+                            if (j === data.tracks[j].artists.length - 1 && data.tracks[j].artists.length > 1) {
+                                artists += " and " + data.tracks[j].artists[j].name;
+                            } else {
+                                artists += data.tracks[j].artists[j].name + " ";
+                            }
+                        }
+                        var string = data.tracks[i].name + " by " + artists;
+                        span.innerText = string;
+                        divArtist.appendChild(span);
+                        divPreview.appendChild(audio);
+
+                        div.appendChild(divArtist);
+                        div.appendChild(divPreview);
+                        container.appendChild(div);
+                    }
+                }
+
+            },
+            dataType: 'json',
+            contentType: 'application/json'
+        });
+    }
+
+    function deleteAttribute(element) {
+        element.parentNode.removeChild(element);
+    }
+    function addGenre() {
+        var genre = document.getElementById("genreOptions");
+        var lookForInput = document.getElementById(genre.value);
+        if (lookForInput === null) {
+            var container = document.getElementById("selectedGenres");
+            var div = document.createElement("div");
+            div.classList.add("genre");
+            div.id = genre.value;
+
+            div.onclick = function () {
+                deleteAttribute(this);
+            };
+
+            var attributeSpan = document.createElement("span");
+            attributeSpan.innerText = genre.value + " ";
+
+            div.appendChild(attributeSpan);
+
+            container.appendChild(div);
+        }
+    }
+    function addAttribute() {
+        var attribute = document.getElementById("attributeOptions");
+        var lookForInput = document.getElementById(attribute.value);
+        if (lookForInput === null) {
+            var container = document.getElementById("selectedAttributes");
+            var value = document.getElementById("attributeValue");
+            var div = document.createElement("div");
+            div.classList.add("attribute");
+            div.id = attribute.value;
+
+            div.onclick = function () {
+                deleteAttribute(this);
+            };
+
+            var attributeSpan = document.createElement("span");
+            attributeSpan.innerText = attribute.value + " ";
+
+            var valueSpan = document.createElement("span");
+            valueSpan.innerText = value.value;
+
+            div.appendChild(attributeSpan);
+            div.appendChild(valueSpan);
+
+            container.appendChild(div);
+
+            value.value = 0;
+        }
+    }
+
+    function openTab(evt, cityName) {
+        if (cityName === "genres" && genresLoaded === false)
+            callApi();
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    function moveItem(t, type) {
+        if (t.parentElement.id === type + "Results") {
+            var container = document.getElementById(type + "Added");
+            container.append(t);
+        }
+        else {
+            var container = document.getElementById(type + "Results");
+            container.append(t);
+        }
+    }
+
+    function search(element, type) {
+        var query = element.parentElement.previousElementSibling.children[0].value
+        var container = document.getElementById(type + "Results")
+        container.innerHTML = "";
+        var request = new XMLHttpRequest();
+
+        request.open('GET', 'https://localhost:44388/api/Search?query=' + query + '&types=' + type, true);
+        request.onload = function () {
+
+            // Begin accessing JSON data here
+            var data = JSON.parse(this.response);
+
+            if (request.status >= 200 && request.status < 400) {
+
+                if (type === "artist")
+                    for (var i = 0; i < data.artists.items.length; i++) {
+                        var div = document.createElement("div");
+                        div.classList.add(type);
+                        div.onclick = function () {
+                            moveItem(this, type);
+                        };
+                        var span = document.createElement("span");
+
+                        span.innerText = data.artists.items[i].name;
+                        div.id = data.artists.items[i].id;
+
+                        div.appendChild(span);
+                        container.appendChild(div);
+                    }
+                if (type === "track") {
+                    for (var i = 0; i < data.tracks.items.length; i++) {
+                        var div = document.createElement("div");
+                        div.classList.add(type);
+                        div.onclick = function () {
+                            moveItem(this, type);
+                        };
+                        var span = document.createElement("span");
+
+                        span.innerText = data.tracks.items[i].name + " by " + data.tracks.items[i].artists[0].name;
+                        div.id = data.tracks.items[i].id;
+
+                        div.appendChild(span);
+                        container.appendChild(div);
+                    }
+                }
+            } else {
+                console.log('error');
+            }
+        }
+        request.send();
+    }
+
+    function callApi() {
+        var request = new XMLHttpRequest();
+
+        request.open('GET', 'https://localhost:44388/api/Recommendation/getgenres', true);
+        request.onload = function () {
+
+            var data = JSON.parse(this.response);
+
+            if (request.status >= 200 && request.status < 400) {
+                var container = document.getElementById("genreOptions");
+
+                for (var i = 0; i < data.length; i++) {
+
+                    var option = document.createElement("option");
+                    option.value = data[i];
+                    option.innerText = data[i]
+
+                    container.appendChild(option);
+                }
+            } else {
+                console.log('error');
+            }
+        }
+        request.send();
+    }
+</script>
